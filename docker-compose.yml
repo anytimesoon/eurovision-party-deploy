@@ -1,0 +1,58 @@
+services:
+  eurovision_db:
+    image: mysql:latest
+    container_name: eurovision-db
+    volumes:
+      - db:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpw
+      MYSQL_DATABASE: eurovision
+      MYSQL_USER: eurovision
+      MYSQL_PASSWORD: cabinpw
+
+  eurovision_backend:
+    image: anytimesoon/eurovision-party-backend:latest
+    container_name: eurovision-backend
+    volumes:
+      - assets:/assets
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      DB_PASSWORD: cabinpw
+      DB_HOSTNAME: eurovision_db
+      DB_PORT: 3306
+      DB_NAME: eurovision
+      DB_USERNAME: eurovision
+      BACKEND_PORT: 8080
+      BACKEND_HOSTNAME: 0.0.0.0
+      DOMAIN_NAME: eurovision_frontend
+      FRONTEND_PORT: 3000
+      CHAT_BOT_NAME: EuroBot
+
+  eurovision_frontend:
+    image: anytimesoon/eurovision-party-frontend:latest
+    container_name: eurovision-frontend
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      PUBLIC_GO_HOST: eurovision_backend
+      PUBLIC_GO_PORT: 8080
+
+  caddy:
+    image: caddy/caddy:2.2.1-alpine
+    container_name: eurovision-reverse-proxy
+    restart: always
+    ports:
+      - 80:80
+
+volumes:
+  db:
+    driver: local
+  assets:
+    driver: local
