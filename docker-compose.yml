@@ -1,4 +1,19 @@
 services:
+  caddy:
+    image: caddy
+    container_name: eurovision-reverse-proxy
+    networks:
+      - euro-net
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./caddy/data/:/data/
+      - ./caddy/config/:/config/
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+
+
   eurovision_db:
     image: mysql:latest
     container_name: eurovision-db
@@ -50,21 +65,6 @@ services:
       PUBLIC_GO_HOST: eurovision_backend
       PUBLIC_GO_PORT: 8080
 #      ORIGIN: eurovision_frontend:3000
-
-  caddy:
-    image: caddy
-    container_name: eurovision-reverse-proxy
-    networks:
-      - euro-net
-    restart: always
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - ./caddy/data/:/data/
-      - ./caddy/config/:/config/
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-
 
 volumes:
   db:
