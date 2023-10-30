@@ -2,6 +2,8 @@ services:
   eurovision_db:
     image: mysql:latest
     container_name: eurovision-db
+    networks:
+      - euro-net
     volumes:
       - db:/var/lib/mysql
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -17,6 +19,8 @@ services:
   eurovision_backend:
     image: anytimesoon/eurovision-party-backend:latest
     container_name: eurovision-backend
+    networks:
+      - euro-net
     volumes:
       - assets:/assets
     restart: always
@@ -37,19 +41,30 @@ services:
   eurovision_frontend:
     image: anytimesoon/eurovision-party-frontend:latest
     container_name: eurovision-frontend
+    networks:
+      - euro-net
     restart: always
     ports:
       - 3000:3000
     environment:
       PUBLIC_GO_HOST: eurovision_backend
       PUBLIC_GO_PORT: 8080
+#      ORIGIN: eurovision_frontend:3000
 
   caddy:
-    image: caddy/caddy:2.2.1-alpine
+    image: caddy
     container_name: eurovision-reverse-proxy
+    networks:
+      - euro-net
     restart: always
     ports:
       - 80:80
+      - 443:443
+    volumes:
+      - ./caddy/data/:/data/
+      - ./caddy/config/:/config/
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+
 
 volumes:
   db:
