@@ -1,0 +1,10 @@
+{
+    email damien@delartigue.co.uk
+}
+
+localhost:443 {
+    reverse_proxy http://eurovision_frontend:3000
+    reverse_proxy /content/static/* http://eurovision_backend:8080
+    reverse_proxy /api/login http://eurovision_backend:8080
+    reverse_proxy /restricted/* http://eurovision_backend:808
+}
