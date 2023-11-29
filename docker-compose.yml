@@ -32,6 +32,7 @@ services:
     container_name: eurovision-backend
     volumes:
       - img:/img/avatars
+      - ./backend/:/conf/
     restart: always
     ports:
       - 8080:8080
